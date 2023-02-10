@@ -105,9 +105,11 @@
                     <div class="card-header">
                         <h4>
                             Список задач
-                            <button type="button" class="btn btn-primary float-end" data-bs-toggle="modal"
-                                    data-bs-target="#AddTodoModal">Добавление задачи
-                            </button>
+                            @auth
+                                <button type="button" class="btn btn-primary float-end" data-bs-toggle="modal"
+                                        data-bs-target="#AddTodoModal">Добавление задачи
+                                </button>
+                            @endauth
                         </h4>
                     </div>
                     <div class="card-body">
@@ -154,8 +156,8 @@
                             <td>' + item.name + '</td>\
                             <td>' + item.description + '</td>\
                             <td>' + item.status + '</td>\
-                            <td><button type="button" value="' + item.id + '" class="btn btn-primary editbtn btn-sm">Редактировать</button></td>\
-                            <td><button type="button" value="' + item.id + '" class="btn btn-danger deletebtn btn-sm">Удалить</button></td>\
+                            <td>@auth<button type="button" value="' + item.id + '" class="btn btn-primary editbtn btn-sm">Редактировать</button>@endauth</td>\
+                            <td>@auth<button type="button" value="' + item.id + '" class="btn btn-danger deletebtn btn-sm">Удалить</button>@endauth</td>\
                         \</tr>');
                         });
                     }
@@ -210,7 +212,7 @@
             $(document).on('click', '.editbtn', function (e) {
                 e.preventDefault();
                 var todo_id = $(this).val();
-                 // alert(todo_id);
+                // alert(todo_id);
                 $('#editModal').modal('show');
                 $.ajax({
                     type: "GET",
@@ -238,7 +240,7 @@
 
                 $(this).text('Обновить');
                 var id = $('#todo_id').val();
-                 // alert(id);
+                // alert(id);
 
                 var data = {
                     'name': $('#name').val(),

@@ -8,6 +8,12 @@ use Illuminate\Database\Eloquent\Model;
 class Todo extends Model
 {
     use HasFactory;
+
+    public function user()
+    {
+        return $this->belongsTo(Todo::class);
+    }
+
     protected $fillable = [
         'name',
         'description',

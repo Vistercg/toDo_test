@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('description');
             $table->string('status')->default('Не выполнена');
+            $table->integer('user_id')->unsigned();
             $table->timestamps();
         });
     }

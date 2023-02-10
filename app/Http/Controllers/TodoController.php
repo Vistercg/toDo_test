@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Todo;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class TodoController extends Controller
@@ -15,7 +16,7 @@ class TodoController extends Controller
 
     public function fetchtodo()
     {
-        $todos = Todo::all();
+        $todos = Todo::where('user_id', Auth::user()->id)->get();
         return response()->json([
             'todos'=>$todos,
         ]);
@@ -40,6 +41,7 @@ class TodoController extends Controller
             $todo = new Todo();
             $todo->name = $request->input('name');
             $todo->description = $request->input('description');
+            $todo->user_id = Auth::user()->id;
             $todo->save();
             return response()->json([
                 'status'=>200,

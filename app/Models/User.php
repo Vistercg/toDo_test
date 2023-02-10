@@ -17,6 +17,12 @@ class User extends Authenticatable
      *
      * @var array<int, string>
      */
+    public function toDo()
+    {
+        return $this->hasMany(Todo::class);
+
+    }
+
     protected $fillable = [
         'name',
         'email',
