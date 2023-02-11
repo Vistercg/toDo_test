@@ -9,6 +9,11 @@ class Todo extends Model
 {
     use HasFactory;
 
+    public function tags()
+    {
+        return $this->belongsToMany(Tag::class); //пост может иметь много тегов
+    }
+
     public function user()
     {
         return $this->belongsTo(Todo::class);
@@ -18,5 +23,6 @@ class Todo extends Model
         'name',
         'description',
         'status',
+        'image'
     ];
 }

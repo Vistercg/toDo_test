@@ -13,13 +13,10 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('todos', function (Blueprint $table) {
+        Schema::create('todo_tag', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('description');
-            $table->string('status')->default('Не выполнена');
-            $table->string('image')->default('Нет изображения');
-            $table->integer('user_id')->unsigned();
+            $table->integer('tag_id')->unsigned();
+            $table->integer('todo_id')->unsigned();
             $table->timestamps();
         });
     }
@@ -31,6 +28,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('todos');
+        Schema::dropIfExists('todo_tag');
     }
 };

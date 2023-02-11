@@ -63,6 +63,19 @@
                             <option value="Выполнена">Выполнена</option>
                         </select>
                     </div>
+                    <div class="form-group mb-3">
+                        <label for="thumbnail">Изображение</label>
+                        <div class="input-group">
+                            <div class="custom-file">
+                                <input type="file" name="thumbnail" id="thumbnail"
+                                       class="custom-file-input">
+                                <label class="custom-file-label" for="thumbnail">Выберите файл</label>
+                            </div>
+                        </div>
+                        <div class="card-body p-0">
+                            <img src="https://via.placeholder.com/150x150" alt="" class="img-fluid">
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
@@ -120,8 +133,9 @@
                                 <th>Название</th>
                                 <th>Описание</th>
                                 <th>Статус</th>
-                                <th>Редактировать</th>
-                                <th>Удалить</th>
+                                <th>Тэги</th>
+                                <th>Изображение</th>
+                                <th>Действие</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -148,7 +162,7 @@
                     url: "/fetch-todos",
                     dataType: "json",
                     success: function (response) {
-                        // console.log(response);
+                        console.log(response);
                         $('tbody').html("");
                         $.each(response.todos, function (key, item) {
                             $('tbody').append('<tr>\
@@ -156,8 +170,10 @@
                             <td>' + item.name + '</td>\
                             <td>' + item.description + '</td>\
                             <td>' + item.status + '</td>\
-                            <td>@auth<button type="button" value="' + item.id + '" class="btn btn-primary editbtn btn-sm">Редактировать</button>@endauth</td>\
-                            <td>@auth<button type="button" value="' + item.id + '" class="btn btn-danger deletebtn btn-sm">Удалить</button>@endauth</td>\
+                            <td>' + item.tags + '</td>\
+                            <td>' + item.image + '</td>\
+                            <td>@auth<button type="button" value="' + item.id + '" class="btn btn-primary editbtn btn-sm">Редактировать</button>\
+                                <button type="button" value="' + item.id + '" class="btn btn-danger deletebtn btn-sm">Удалить</button>@endauth</td>\
                         \</tr>');
                         });
                     }
