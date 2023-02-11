@@ -88,8 +88,6 @@
                         <select name="tags[]" id="tags" class="select2" multiple="multiple"
                                 data-placeholder="Выбор тегов" style="width: 100%;">
 
-                                <option value=""  selected </option>
-
                         </select>
                     </div>
                     <div class="form-group mb-3">
@@ -277,6 +275,14 @@
                             $('#description').val(response.todo.description);
                             $('#status').val(response.todo.status);
                             $('#todo_id').val(todo_id);
+                            $('#tags').val(response.todo.tags);
+
+                            let tagsHtml = ''
+                            for (let i = 0; i < response.todo.tags.length; i++) {
+                                alert(response.todo.tags[i].title)
+                                tagsHtml+= '<option selected value="' + response.todo.tags[i].title + ',> </option>'
+                            }
+
                         }
                     }
                 });

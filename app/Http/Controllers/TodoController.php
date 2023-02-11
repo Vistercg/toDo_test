@@ -37,7 +37,7 @@ class TodoController extends Controller
 
     public function edit($id)
     {
-        $todo = Todo::find($id);
+        $todo = new ToDoResource(Todo::find($id)->loadMissing('tags'));
         if ($todo) {
             return response()->json([
                 'status' => 200,
