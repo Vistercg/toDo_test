@@ -22,6 +22,26 @@
                         <label for="">Полное описание задачи</label>
                         <input type="text" required class="description form-control">
                     </div>
+                    <div class="form-group mb-3">
+                        <label for="tags">Теги</label>
+                        <a href="" class="btn btn-secondary mb-3">Добавить тег</a>
+                        <select name="tags[]" id="tags" class="select2" multiple="multiple"
+                                data-placeholder="Выбор тегов" style="width: 100%;">
+                                <option value="" </option>
+                        </select>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="thumbnail">Изображение</label>
+                        <div class="input-group">
+                            <div class="custom-file">
+                                <input type="file" name="thumbnail" id="thumbnail"
+                                       class="custom-file-input">
+                            </div>
+                        </div>
+                        <div class="card-body p-0">
+                            <img src="https://via.placeholder.com/150x150" alt="" class="img-fluid">
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
@@ -61,6 +81,15 @@
                         <select class="form-select" id="status" aria-label="status">
                             <option selected value="Не выполнена">Не выполнена</option>
                             <option value="Выполнена">Выполнена</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="tags">Теги</label>
+                        <select name="tags[]" id="tags" class="select2" multiple="multiple"
+                                data-placeholder="Выбор тегов" style="width: 100%;">
+
+                                <option value=""  selected </option>
+
                         </select>
                     </div>
                     <div class="form-group mb-3">
@@ -162,15 +191,20 @@
                     url: "/fetch-todos",
                     dataType: "json",
                     success: function (response) {
-                        console.log(response);
+                        //console.log(response);
                         $('tbody').html("");
                         $.each(response.todos, function (key, item) {
-                            $('tbody').append('<tr>\
+                            let tagsHtml = ''
+                            for (let i = 0; i < item.tags.length; i++) {
+                                tagsHtml+= '<span>' + item.tags[i].title + ', <span>'
+                            }
+                            $('tbody').append(
+                            '<tr>\
                             <td>' + item.id + '</td>\
                             <td>' + item.name + '</td>\
                             <td>' + item.description + '</td>\
                             <td>' + item.status + '</td>\
-                            <td>' + item.tags + '</td>\
+                            <td>' + tagsHtml + '</td>\
                             <td>' + item.image + '</td>\
                             <td>@auth<button type="button" value="' + item.id + '" class="btn btn-primary editbtn btn-sm">Редактировать</button>\
                                 <button type="button" value="' + item.id + '" class="btn btn-danger deletebtn btn-sm">Удалить</button>@endauth</td>\
@@ -188,7 +222,6 @@
                 var data = {
                     'name': $('.name').val(),
                     'description': $('.description').val(),
-                    'status': $('.status').val(),
                 }
 
                 $.ajaxSetup({

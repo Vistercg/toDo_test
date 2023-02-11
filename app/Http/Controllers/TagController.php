@@ -10,14 +10,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
-class TodoController extends Controller
+class TagController extends Controller
 {
-    public function index()
-    {
-        return view('toDo');
-    }
-
-    public function fetchtodo()
+    public function fetchtag()
     {
         $todos = ToDo::where('user_id', Auth::user()->id)->get();
         $todos_json = new ToDoCollection($todos->loadMissing('tags'));

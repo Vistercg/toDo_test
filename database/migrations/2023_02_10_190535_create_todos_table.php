@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::create('todos', function (Blueprint $table) {
-            $table->id();
+            $table->bigIncrements('id');
             $table->string('name');
             $table->string('description');
             $table->string('status')->default('Не выполнена');

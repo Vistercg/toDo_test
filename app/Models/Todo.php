@@ -11,18 +11,19 @@ class Todo extends Model
 
     public function tags()
     {
-        return $this->belongsToMany(Tag::class); //пост может иметь много тегов
+        return $this->belongsToMany(Tag::class);
     }
 
     public function user()
     {
-        return $this->belongsTo(Todo::class);
+        return $this->belongsTo(User::class);
     }
 
     protected $fillable = [
         'name',
         'description',
         'status',
-        'image'
+        'image',
+        'user_id',
     ];
 }
