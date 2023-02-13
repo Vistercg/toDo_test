@@ -21,6 +21,7 @@ Auth::routes();
 
 Route::get('/', [TodoController::class, 'index']);
 Route::post('todos', [TodoController::class, 'store']);
+Route::get('todos', [TodoController::class, 'getTags']);
 Route::get('fetch-todos', [TodoController::class, 'fetchtodo']);
 Route::get('edit-todo/{id}', [TodoController::class, 'edit']);
 Route::put('update-todo/{id}', [TodoController::class, 'update']);

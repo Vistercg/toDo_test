@@ -30,7 +30,10 @@ class ToDoRequest extends FormRequest
         return [
             'name'=> 'required|max:191',
             'description'=>'required|max:191',
-            'user_id' => 'required'
+            'user_id' => 'required',
+            'tags' => '',
+            'tag' => '',
+            'image' => ['nullable', 'image', 'mimes:jpg,png,jpeg,bmp', 'max:5120'],
         ];
     }
 

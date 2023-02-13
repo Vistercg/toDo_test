@@ -12,36 +12,35 @@
                 </div>
                 <div class="modal-body">
 
-                    <ul id="save_msgList"></ul>
+                    <form id="formAdd" action="/todos" method="POST">
+                        <ul id="save_msgList"></ul>
 
-                    <div class="form-group mb-3">
-                        <label for="">Наименование</label>
-                        <input type="text" required class="name form-control">
-                    </div>
-                    <div class="form-group mb-3">
-                        <label for="">Полное описание задачи</label>
-                        <input type="text" required class="description form-control">
-                    </div>
-                    <div class="form-group mb-3">
-                        <label for="tags">Теги</label>
-                        <a href="" class="btn btn-secondary mb-3">Добавить тег</a>
-                        <select name="tags[]" id="tags" class="select2" multiple="multiple"
-                                data-placeholder="Выбор тегов" style="width: 100%;">
-                                <option value="" </option>
-                        </select>
-                    </div>
-                    <div class="form-group mb-3">
-                        <label for="thumbnail">Изображение</label>
-                        <div class="input-group">
-                            <div class="custom-file">
-                                <input type="file" name="thumbnail" id="thumbnail"
-                                       class="custom-file-input">
+                        <div class="form-group mb-3">
+                            <label for="">Наименование</label>
+                            <input name="name" type="text" required class="name form-control">
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="">Полное описание задачи</label>
+                            <input name="description" type="text" required class="description form-control">
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="tag">Теги</label>
+                            <select name="tag[]" id="tag" class="select2" multiple="multiple"
+                                    data-placeholder="Выбор тегов" style="width: 100%;">
+
+                            </select>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="image">Изображение</label>
+                            <div class="input-group">
+                                <div class="custom-file">
+                                    <input type="file" name="image" id="image"
+                                           class="custom-file-input">
+                                </div>
                             </div>
                         </div>
-                        <div class="card-body p-0">
-                            <img src="https://via.placeholder.com/150x150" alt="" class="img-fluid">
-                        </div>
-                    </div>
+                    </form>
+
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
@@ -91,16 +90,12 @@
                         </select>
                     </div>
                     <div class="form-group mb-3">
-                        <label for="thumbnail">Изображение</label>
+                        <label for="image">Изображение</label>
                         <div class="input-group">
                             <div class="custom-file">
-                                <input type="file" name="thumbnail" id="thumbnail"
+                                <input type="file" name="image" id="image"
                                        class="custom-file-input">
-                                <label class="custom-file-label" for="thumbnail">Выберите файл</label>
                             </div>
-                        </div>
-                        <div class="card-body p-0">
-                            <img src="https://via.placeholder.com/150x150" alt="" class="img-fluid">
                         </div>
                     </div>
                 </div>
@@ -146,7 +141,8 @@
                         <h4>
                             Список задач
                             @auth
-                                <button type="button" class="btn btn-primary float-end" data-bs-toggle="modal"
+                                <button type="button" class="btn btn-primary addtodobtn float-end"
+                                        data-bs-toggle="modal"
                                         data-bs-target="#AddTodoModal">Добавление задачи
                                 </button>
                             @endauth
@@ -181,6 +177,9 @@
     <script>
         $(document).ready(function () {
 
+            $('#AddTodoModal #tag').select2();
+            $('#editModal #tags').select2();
+
             fetchtodo();
 
             function fetchtodo() {
@@ -194,16 +193,17 @@
                         $.each(response.todos, function (key, item) {
                             let tagsHtml = ''
                             for (let i = 0; i < item.tags.length; i++) {
-                                tagsHtml+= '<span>' + item.tags[i].title + ', <span>'
+                                tagsHtml += '<span>' + item.tags[i].title + ', <span>'
                             }
+                            let image = item.image ? '<a href="storage/app/public/' + item.image + '" target="_blank"><img src="storage/app/public/' + item.image + '" width="150" height="150" /></a>' : '';
                             $('tbody').append(
-                            '<tr>\
-                            <td>' + item.id + '</td>\
+                                '<tr>\
+                                <td>' + item.id + '</td>\
                             <td>' + item.name + '</td>\
                             <td>' + item.description + '</td>\
                             <td>' + item.status + '</td>\
                             <td>' + tagsHtml + '</td>\
-                            <td>' + item.image + '</td>\
+                            <td>' + image + '</td>\
                             <td>@auth<button type="button" value="' + item.id + '" class="btn btn-primary editbtn btn-sm">Редактировать</button>\
                                 <button type="button" value="' + item.id + '" class="btn btn-danger deletebtn btn-sm">Удалить</button>@endauth</td>\
                         \</tr>');
@@ -212,15 +212,36 @@
                 });
             }
 
+            $(document).on('click', '.addtodobtn', function (e) {
+                e.preventDefault();
+                $('#AddTodoModal').modal('show');
+
+                $.ajax({
+                    type: "GET",
+                    url: "/todos",
+                    success: function (response) {
+                        if (response.status == 404) {
+                            $('#success_message').addClass('alert alert-success');
+                            $('#success_message').text(response.message);
+                            $('#AddTodoModal').modal('hide');
+                        } else {
+                            let tagsHtml = ''
+                            for (let i = 0; i < response.tags.length; i++) {
+                                let selected = response.tags.indexOf(response.tags[i].id) !== -1;
+                                tagsHtml += '<option ' + selected + ' value="' + response.tags[i].id + '">' + response.tags[i].title + '</option>'
+                            }
+
+                            $('#AddTodoModal #tag').html(tagsHtml).trigger('change');
+                        }
+                    }
+                });
+                $('.btn-close').find('input').val('');
+            });
+
             $(document).on('click', '.add_todo', function (e) {
                 e.preventDefault();
 
                 $(this).text('Сохранение..');
-
-                var data = {
-                    'name': $('.name').val(),
-                    'description': $('.description').val(),
-                }
 
                 $.ajaxSetup({
                     headers: {
@@ -228,32 +249,27 @@
                     }
                 });
 
-                $.ajax({
-                    type: "POST",
-                    url: "/todos",
-                    data: data,
-                    dataType: "json",
-                    success: function (response) {
-                        // console.log(response);
-                        if (response.status == 400) {
-                            $('#save_msgList').html("");
-                            $('#save_msgList').addClass('alert alert-danger');
-                            $.each(response.errors, function (key, err_value) {
-                                $('#save_msgList').append('<li>' + err_value + '</li>');
-                            });
-                            $('.add_todo').text('Сохранить');
-                        } else {
-                            $('#save_msgList').html("");
-                            $('#success_message').addClass('alert alert-success');
-                            $('#success_message').text(response.message);
-                            $('#AddTodoModal').find('input').val('');
-                            $('.add_todo').text('Сохранить');
-                            $('#AddTodoModal').modal('hide');
-                            fetchtodo();
-                        }
-                    }
-                });
-
+                var options = {
+                    success: function (response, statusText) {
+                        $('#save_msgList').html("");
+                        $('#success_message').addClass('alert alert-success');
+                        $('#success_message').text(response.message);
+                        $('#AddTodoModal').find('input').val('');
+                        $('.add_todo').text('Сохранить');
+                        $('#AddTodoModal').modal('hide');
+                        fetchtodo();
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        $('#save_msgList').html("");
+                        $('#save_msgList').addClass('alert alert-danger');
+                        $.each(XMLHttpRequest.errors, function (key, err_value) {
+                            $('#save_msgList').append('<li>' + err_value + '</li>');
+                        });
+                        $('.add_todo').text('Сохранить');
+                    },
+                    dataType: 'json'
+                };
+                $("#formAdd").ajaxSubmit(options);
             });
 
             $(document).on('click', '.editbtn', function (e) {
@@ -271,17 +287,19 @@
                             $('#editModal').modal('hide');
                         } else {
                             // console.log(response.todo.name);
-                            $('#name').val(response.todo.name);
-                            $('#description').val(response.todo.description);
-                            $('#status').val(response.todo.status);
-                            $('#todo_id').val(todo_id);
-                            $('#tags').val(response.todo.tags);
+                            $('#editModal #name').val(response.todo.name);
+                            $('#editModal #description').val(response.todo.description);
+                            $('#editModal #status').val(response.todo.status);
+                            $('#editModal #todo_id').val(todo_id);
+                            //$('#tags').val(response.todo.tags);
 
                             let tagsHtml = ''
-                            for (let i = 0; i < response.todo.tags.length; i++) {
-                                alert(response.todo.tags[i].title)
-                                tagsHtml+= '<option selected value="' + response.todo.tags[i].title + ',> </option>'
+                            for (let i = 0; i < response.tags.length; i++) {
+                                //alert(response.todo.tags[i].title)
+                                let selected = response.todoIds.indexOf(response.tags[i].id) !== -1 ? 'selected' : '';
+                                tagsHtml += '<option ' + selected + ' value="' + response.tags[i].id + '">' + response.tags[i].title + '</option>'
                             }
+                            $('#editModal #tags').html(tagsHtml).trigger('change');
 
                         }
                     }
@@ -294,13 +312,14 @@
                 e.preventDefault();
 
                 $(this).text('Обновить');
-                var id = $('#todo_id').val();
+                var id = $('#editModal #todo_id').val();
                 // alert(id);
 
                 var data = {
-                    'name': $('#name').val(),
-                    'description': $('#description').val(),
-                    'status': $('#status').val()
+                    'name': $('#editModal #name').val(),
+                    'description': $('#editModal #description').val(),
+                    'status': $('#editModal #status').val(),
+                    'tags': $('#editModal #tags').val(),
                 }
 
                 $.ajaxSetup({

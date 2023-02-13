@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ToDoRequest;
+use App\Http\Resources\TagCollection;
 use App\Http\Resources\ToDoCollection;
 use App\Http\Resources\ToDoResource;
+use App\Models\Tag;
 use App\Models\Todo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -19,19 +21,29 @@ class TodoController extends Controller
 
     public function fetchtodo()
     {
-        $todos = ToDo::where('user_id', Auth::user()->id)->get();
+        $todos = ToDo::where('user_id', Auth::user()->id)->orderBy('id', 'ASC')->get();
         $todos_json = new ToDoCollection($todos->loadMissing('tags'));
         return response()->json([
             'todos' => $todos_json,
+
         ]);
     }
 
     public function store(ToDoRequest $request)
     {
-        new ToDoResource(Todo::create($request->all()));
+        $this->_fillTodoByRequest(new Todo(), $request);
+
         return response()->json([
             'status' => 200,
-            'message' => 'Задача добавлена.'
+            'message' => 'Задача добавлена.',
+        ]);
+    }
+
+    public function getTags()
+    {
+        return response()->json([
+            'status' => 200,
+            'tags' => new TagCollection(Tag::all()),
         ]);
     }
 
@@ -42,6 +54,8 @@ class TodoController extends Controller
             return response()->json([
                 'status' => 200,
                 'todo' => $todo,
+                'todoIds' => $todo->tags()->pluck('tag_id'),
+                'tags' => new TagCollection(Tag::all())
             ]);
         } else {
             return response()->json([
@@ -52,37 +66,22 @@ class TodoController extends Controller
 
     }
 
-    public function update(Request $request, $id)
+    public function update(ToDoRequest $request, $id)
     {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|max:191',
-            'description' => 'required|max:191',
-        ]);
-
-        if ($validator->fails()) {
+        $todo = Todo::find($id);
+        if(!$todo){
             return response()->json([
-                'status' => 400,
-                'errors' => $validator->messages()
+                'status' => 404,
+                'message' => 'Такой задачи не найдено.'
             ]);
-        } else {
-            $todo = Todo::find($id);
-            if ($todo) {
-                $todo->name = $request->input('name');
-                $todo->description = $request->input('description');
-                $todo->status = $request->input('status');
-                $todo->update();
-                return response()->json([
-                    'status' => 200,
-                    'message' => 'Задача обновлена.'
-                ]);
-            } else {
-                return response()->json([
-                    'status' => 404,
-                    'message' => 'Такой задачи не найдено.'
-                ]);
-            }
-
         }
+
+        $this->_fillTodoByRequest($todo, $request);
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Задача обновлена.'
+        ]);
     }
 
     public function destroy($id)
@@ -100,5 +99,25 @@ class TodoController extends Controller
                 'message' => 'Такой задачи не найдено.'
             ]);
         }
+    }
+
+    private function _fillTodoByRequest(Todo $todo, ToDoRequest $request){
+
+        $todo->fill($request->all());
+        $todo->tags()->detach();
+        if(!empty($request->tags)){
+            $todo->tags()->attach(Tag::whereIn('id', $request->tags)->get());
+        }
+
+        $todo->image = !empty($request->file('image')) ? $request->file('image')->store('image', 'public') : NULL ;
+
+        $todo->save();
+
+        if(!empty($request->tag)) {
+            $todo->tags()->attach($request->tag);
+        }
+
+
+        return $todo;
     }
 }
