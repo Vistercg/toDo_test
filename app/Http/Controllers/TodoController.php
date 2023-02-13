@@ -19,13 +19,23 @@ class TodoController extends Controller
         return view('toDo');
     }
 
-    public function fetchtodo()
+    public function fetchtodo(Request $request)
     {
-        $todos = ToDo::where('user_id', Auth::user()->id)->orderBy('id', 'ASC')->get();
+        $query = $request->get('query');
+        if($query != '')
+        {
+            $todos = ToDo::where('user_id', Auth::user()->id)
+                ->where('name', 'like', '%'.$query.'%')
+                ->orWhere('description', 'like', '%'.$query.'%')
+                ->orWhere('status', 'like', '%'.$query.'%')
+                ->get();
+        } else {
+            $todos = ToDo::where('user_id', Auth::user()->id)->orderBy('id', 'ASC')->get();
+        }
         $todos_json = new ToDoCollection($todos->loadMissing('tags'));
+
         return response()->json([
             'todos' => $todos_json,
-
         ]);
     }
 
