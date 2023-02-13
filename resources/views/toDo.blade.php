@@ -348,7 +348,6 @@
                     dataType: 'json'
                 };
                 $("#formUpdate").ajaxSubmit(options);
-
             /*$(document).on('click', '.update_todo', function (e) {
                 e.preventDefault();
 
