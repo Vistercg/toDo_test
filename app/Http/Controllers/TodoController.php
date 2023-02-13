@@ -39,14 +39,6 @@ class TodoController extends Controller
         ]);
     }
 
-    public function getTags()
-    {
-        return response()->json([
-            'status' => 200,
-            'tags' => new TagCollection(Tag::all()),
-        ]);
-    }
-
     public function edit($id)
     {
         $todo = new ToDoResource(Todo::find($id)->loadMissing('tags'));
@@ -66,13 +58,14 @@ class TodoController extends Controller
 
     }
 
-    public function update(ToDoRequest $request, $id)
+    public function update(ToDoRequest $request)
     {
-        $todo = Todo::find($id);
+        $todo = Todo::find($request->todo_id);
+
         if(!$todo){
             return response()->json([
                 'status' => 404,
-                'message' => 'Такой задачи не найдено.'
+                'message' => 'Такой задачи не найдено.',
             ]);
         }
 
@@ -103,6 +96,7 @@ class TodoController extends Controller
 
     private function _fillTodoByRequest(Todo $todo, ToDoRequest $request){
 
+        $image = $todo->image;
         $todo->fill($request->all());
         $todo->tags()->detach();
         if(!empty($request->tags)){
@@ -111,17 +105,15 @@ class TodoController extends Controller
 
         if (!empty($request->file('image'))){
             $todo->image =  $request->file('image')->store('image', 'public');
-        }  else {
-            $todo->image = $todo->image;
+        } else {
+            $todo->image = $image;
         }
-
 
         $todo->save();
 
         if(!empty($request->tag)) {
             $todo->tags()->attach($request->tag);
         }
-
 
         return $todo;
     }

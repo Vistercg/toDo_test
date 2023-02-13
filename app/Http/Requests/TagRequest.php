@@ -8,7 +8,7 @@ use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
-class ToDoRequest extends FormRequest
+class TagRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -28,22 +28,8 @@ class ToDoRequest extends FormRequest
     public function rules()
     {
         return [
-            'name'=> 'required|max:191',
-            'description'=>'required|max:191',
-            'user_id' => 'required',
-            'tags' => '',
-            'tag' => '',
-            'todo_id' =>'',
-            'image' => ['nullable', 'image', 'mimes:jpg,png,jpeg,bmp', 'max:5120'],
-            'imagetodo_path' => '',
+            'title'=> 'required',
         ];
-    }
-
-    protected function prepareForValidation()
-    {
-        $this->merge([
-            'user_id' =>  Auth::user()->id,
-        ]);
     }
 
     public function failedValidation(Validator $validator)

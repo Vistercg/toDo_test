@@ -64,42 +64,41 @@
                 <div class="modal-body">
 
                     <form id="formUpdate" action="/update-todo/{id}" method="POST">
-                        <input type="hidden" name="_method" value="put" />
-                    <ul id="update_msgList"></ul>
+                        <ul id="update_msgList"></ul>
 
-                    <input type="hidden" id="todo_id"/>
+                        <input type="hidden" name="todo_id" id="todo_id"/>
 
-                    <div class="form-group mb-3">
-                        <label for="">Наименование</label>
-                        <input type="text" id="name" required class="form-control">
-                    </div>
-                    <div class="form-group mb-3">
-                        <label for="">Полное описание задачи</label>
-                        <input type="text" id="description" required class="form-control">
-                    </div>
-                    <div class="form-group mb-3">
-                        <label for="">Статус</label>
-                        <select class="form-select" id="status" aria-label="status">
-                            <option selected value="Не выполнена">Не выполнена</option>
-                            <option value="Выполнена">Выполнена</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="tags">Теги</label>
-                        <select name="tags[]" id="tags" class="select2" multiple="multiple"
-                                data-placeholder="Выбор тегов" style="width: 100%;">
+                        <div class="form-group mb-3">
+                            <label for="">Наименование</label>
+                            <input name="name" type="text" id="name" required class="form-control">
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="">Полное описание задачи</label>
+                            <input name="description" type="text" id="description" required class="form-control">
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="">Статус</label>
+                            <select class="form-select" name="status" id="status" aria-label="status">
+                                <option selected value="Не выполнена">Не выполнена</option>
+                                <option value="Выполнена">Выполнена</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="tags">Теги</label>
+                            <select name="tags[]" id="tags" class="select2" multiple="multiple"
+                                    data-placeholder="Выбор тегов" style="width: 100%;">
 
-                        </select>
-                    </div>
-                    <div class="form-group mb-3">
-                        <label for="image">Изображение</label>
-                        <div class="input-group">
-                            <div class="custom-file">
-                                <input type="file" name="image" id="image"
-                                       class="custom-file-input">
+                            </select>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="image">Изображение</label>
+                            <div class="input-group">
+                                <div class="custom-file">
+                                    <input type="file" name="image" id="image"
+                                           class="custom-file-input">
+                                </div>
                             </div>
                         </div>
-                    </div>
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -133,6 +132,33 @@
     </div>
     {{-- End - Delete Modal --}}
 
+    {{-- Tag Modal --}}
+    <div class="modal fade" id="AddTagModal" tabindex="-1" aria-labelledby="AddTagModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="AddTagModalLabel">Добавление тэга</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+
+                    <ul id="save_msgList"></ul>
+                    <div class="form-group mb-3">
+                        <label for="">Наименование</label>
+                        <input name="title" type="text" required class="title form-control">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                    <button type="button" class="btn btn-primary add_tag">Сохранить</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    {{-- End - Tag Modal --}}
+
+
     <div class="container py-5">
         <div class="row">
             <div class="col-md-12">
@@ -144,10 +170,17 @@
                         <h4>
                             Список задач
                             @auth
-                                <button type="button" class="btn btn-primary addtodobtn float-end"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#AddTodoModal">Добавление задачи
-                                </button>
+                                <div class="flex-box float-end">
+                                    <button type="button" class="btn btn-outline-secondary addtagbtn"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#AddTagModal">Добавление тэга
+                                    </button>
+                                    <button type="button" class="btn btn-primary addtodobtn "
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#AddTodoModal">Добавление задачи
+                                    </button>
+
+                                </div>
                             @endauth
                         </h4>
                     </div>
@@ -221,7 +254,7 @@
 
                 $.ajax({
                     type: "GET",
-                    url: "/todos",
+                    url: "/fetch-tags",
                     success: function (response) {
                         if (response.status == 404) {
                             $('#success_message').addClass('alert alert-success');
@@ -315,10 +348,7 @@
                 e.preventDefault();
 
                 $(this).text('Обновить');
-
                 var id = $('#editModal #todo_id').val();
-
-                // alert(id);
 
                 $.ajaxSetup({
                     headers: {
@@ -348,54 +378,6 @@
                     dataType: 'json'
                 };
                 $("#formUpdate").ajaxSubmit(options);
-            /*$(document).on('click', '.update_todo', function (e) {
-                e.preventDefault();
-
-                $(this).text('Обновить');
-                var id = $('#editModal #todo_id').val();
-                // alert(id);
-
-                var data = {
-                    'name': $('#editModal #name').val(),
-                    'description': $('#editModal #description').val(),
-                    'status': $('#editModal #status').val(),
-                    'tags': $('#editModal #tags').val(),
-                }
-
-                $.ajaxSetup({
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    }
-                });
-
-                $.ajax({
-                    type: "PUT",
-                    url: "/update-todo/" + id,
-                    data: data,
-                    dataType: "json",
-                    success: function (response) {
-                        // console.log(response);
-                        if (response.status == 400) {
-                            $('#update_msgList').html("");
-                            $('#update_msgList').addClass('alert alert-danger');
-                            $.each(response.errors, function (key, err_value) {
-                                $('#update_msgList').append('<li>' + err_value +
-                                    '</li>');
-                            });
-                            $('.update_todo').text('Обновление');
-                        } else {
-                            $('#update_msgList').html("");
-
-                            $('#success_message').addClass('alert alert-success');
-                            $('#success_message').text(response.message);
-                            $('#editModal').find('input').val('');
-                            $('.update_todo').text('Обновление');
-                            $('#editModal').modal('hide');
-                            fetchtodo();
-                        }
-                    }
-                });
-                */
             });
 
             $(document).on('click', '.deletebtn', function () {
@@ -407,8 +389,8 @@
             $(document).on('click', '.delete_todo', function (e) {
                 e.preventDefault();
 
-                $(this).text('Deleting..');
-                var id = $('#deleteing_id').val();
+                $(this).text('Удаление..');
+                var todo_id = $('#deleteing_id').val();
 
                 $.ajaxSetup({
                     headers: {
@@ -418,7 +400,7 @@
 
                 $.ajax({
                     type: "DELETE",
-                    url: "/delete-todo/" + id,
+                    url: "/delete-todo/" + todo_id,
                     dataType: "json",
                     success: function (response) {
                         // console.log(response);
@@ -438,8 +420,71 @@
                 });
             });
 
-        });
+            $(document).on('click', '.add_tag', function (e) {
+                e.preventDefault();
 
+                $(this).text('Добавление..');
+
+                var data = {
+                    'title': $('#AddTagModal .title').val(),
+                }
+
+                $.ajaxSetup({
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    }
+                });
+
+                var options = {
+                    success: function (response, statusText) {
+                        $('#save_msgList').html("");
+                        $('#success_message').addClass('alert alert-success');
+                        $('#success_message').text(response.message);
+                        $('#AddTagModal').find('input').val('');
+                        $('.add_tag').text('Сохранить');
+                        $('#AddTag').modal('hide');
+                        fetchtodo();
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        $('#save_msgList').html("");
+                        $('#save_msgList').addClass('alert alert-danger');
+                        $.each(XMLHttpRequest.errors, function (key, err_value) {
+                            $('#save_msgList').append('<li>' + err_value + '</li>');
+                        });
+                        $('.add_tag').text('Сохранить');
+                    },
+                    dataType: 'json'
+                };
+                $("#formAdd").ajaxSubmit(options);
+
+                $.ajax({
+                    type: "POST",
+                    url: "/tags",
+                    data: data,
+                    dataType: "json",
+                    success: function (response) {
+                        // console.log(response);
+                        if (response.status == 400) {
+                            $('#save_msgList').html("");
+                            $('#save_msgList').addClass('alert alert-danger');
+                            $.each(response.errors, function (key, err_value) {
+                                $('#save_msgList').append('<li>' + err_value + '</li>');
+                            });
+                            $('.add_tag').text('Сохранить');
+                        } else {
+                            $('#save_msgList').html("");
+                            $('#success_message').addClass('alert alert-success');
+                            $('#success_message').text(response.message);
+                            $('#AddTagModal').find('input').val('');
+                            $('.add_tag').text('Сохранить');
+                            $('#AddTagModal').modal('hide');
+                            fetchtodo();
+                        }
+                    }
+                })
+            })
+
+
+        })
     </script>
-
 @endsection

@@ -17,8 +17,8 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('todo_id');
             $table->unsignedBigInteger('tag_id');
-            $table->foreign('todo_id')->references('id')->on('todos');
-            $table->foreign('tag_id')->references('id')->on('tags');
+            $table->foreign('todo_id')->references('id')->on('todos')->cascadeOnDelete();
+            $table->foreign('tag_id')->references('id')->on('tags')->cascadeOnDelete();
         });
     }
 
