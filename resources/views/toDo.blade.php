@@ -63,6 +63,8 @@
 
                 <div class="modal-body">
 
+                    <form id="formUpdate" action="/update-todo/{id}" method="POST">
+                        <input type="hidden" name="_method" value="put" />
                     <ul id="update_msgList"></ul>
 
                     <input type="hidden" id="todo_id"/>
@@ -98,6 +100,7 @@
                             </div>
                         </div>
                     </div>
+                    </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
@@ -312,6 +315,44 @@
                 e.preventDefault();
 
                 $(this).text('Обновить');
+
+                var id = $('#editModal #todo_id').val();
+
+                // alert(id);
+
+                $.ajaxSetup({
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    }
+                });
+
+                var options = {
+                    success: function (response, statusText) {
+                        $('#update_msgList').html("");
+                        $('#success_message').addClass('alert alert-success');
+                        $('#success_message').text(response.message);
+                        $('#editModal').find('input').val('');
+                        $('.update_todo').text('Обновление');
+                        $('#editModal').modal('hide');
+                        fetchtodo();
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        $('#update_msgList').html("");
+                        $('#update_msgList').addClass('alert alert-danger');
+                        $.each(response.errors, function (key, err_value) {
+                            $('#update_msgList').append('<li>' + err_value +
+                                '</li>');
+                        });
+                        $('.update_todo').text('Обновление');
+                    },
+                    dataType: 'json'
+                };
+                $("#formUpdate").ajaxSubmit(options);
+
+            /*$(document).on('click', '.update_todo', function (e) {
+                e.preventDefault();
+
+                $(this).text('Обновить');
                 var id = $('#editModal #todo_id').val();
                 // alert(id);
 
@@ -355,7 +396,7 @@
                         }
                     }
                 });
-
+                */
             });
 
             $(document).on('click', '.deletebtn', function () {

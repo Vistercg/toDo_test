@@ -109,7 +109,12 @@ class TodoController extends Controller
             $todo->tags()->attach(Tag::whereIn('id', $request->tags)->get());
         }
 
-        $todo->image = !empty($request->file('image')) ? $request->file('image')->store('image', 'public') : NULL ;
+        if (!empty($request->file('image'))){
+            $todo->image =  $request->file('image')->store('image', 'public');
+        }  else {
+            $todo->image = $todo->image;
+        }
+
 
         $todo->save();
 
