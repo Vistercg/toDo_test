@@ -14,8 +14,7 @@ ToDo список.
 $ git clone https://github.com/Vistercg/toDo_test.git
 
 Далее выполняем комманды
-composer install
-npm install
+composer install и npm install
 
 Далее открываем файл .env и прописываем там свои переменные для доступа к вашей БД
 DB_CONNECTION=mysql
