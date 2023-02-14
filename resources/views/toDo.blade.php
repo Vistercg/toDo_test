@@ -79,7 +79,8 @@
                         <div class="form-group mb-3">
                             <label for="">Статус</label>
                             <select class="form-select" name="status" id="status" aria-label="status">
-                                <option selected value="Не выполнена">Не выполнена</option>
+                                <option selected value="Только создана">Только создана</option>
+                                <option selected value="В процессе">В процессе</option>
                                 <option value="Выполнена">Выполнена</option>
                             </select>
                         </div>
@@ -180,8 +181,8 @@
                                 </div>
                             @endauth
                         </h4>
-                        <div class="row">
-                            <div class="col-md-6">
+                        <div class="row mb-0">
+                            <div class="col-md-5 offset mb-1">
                                 <div class="panel-body">
                                     <div class="form-group">
                                         <input type="text" name="search" id="search" class="form-control"

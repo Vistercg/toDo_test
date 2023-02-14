@@ -51,7 +51,7 @@ class DatabaseSeeder extends Seeder
                     "name" => "Задача №" . $i,
                     "description" => "Описание задача №" . $i,
                     "user_id" => rand(1, $this->maxUsers),
-                    "status" => 'Не выполнена',
+                    "status" => 'Только создана',
                 ]
             );
             $todo->save();
