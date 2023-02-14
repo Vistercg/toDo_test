@@ -32,12 +32,6 @@ class TodoController extends Controller
                     ->orWhere('status', 'like', '%' . $query . '%');
                 })
                 ->get();
-
-            /*$todos = ToDo::where('user_id', Auth::user()->id)
-                ->where('name', 'like', '%'.$query.'%')
-                ->orWhere('description', 'like', '%'.$query.'%')
-                ->orWhere('status', 'like', '%'.$query.'%')
-                ->get();*/
         } else {
             $todos = ToDo::where('user_id', Auth::user()->id)->orderBy('id', 'ASC')->get();
         }
