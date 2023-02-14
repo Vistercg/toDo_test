@@ -17,11 +17,17 @@ $ git clone https://github.com/Vistercg/toDo_test.git
 composer install и npm install
 
 Далее открываем файл .env и прописываем там свои переменные для доступа к вашей БД
+
 DB_CONNECTION=mysql
+
 DB_HOST=127.0.0.1
+
 DB_PORT=3306
+
 DB_DATABASE=ToDO
+
 DB_USERNAME=root
+
 DB_PASSWORD=
 
 выполняем миграции командой
