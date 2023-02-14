@@ -168,29 +168,30 @@
                     <div class="card-header">
                         <h4>
                             Список задач
-                            @auth
-                                <div class="flex-box float-end">
-                                    <button type="button" class="btn btn-outline-secondary addtagbtn"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#AddTagModal">Добавление тэга
-                                    </button>
-                                    <button type="button" class="btn btn-primary addtodobtn "
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#AddTodoModal">Добавление задачи
-                                    </button>
-                                </div>
-                            @endauth
                         </h4>
-                        <div class="row mb-0">
-                            <div class="col-md-5 offset mb-1">
-                                <div class="panel-body">
-                                    <div class="form-group">
-                                        <input type="text" name="search" id="search" class="form-control"
-                                               placeholder="Поиск задачи"/>
+                        @auth
+                            <div class="flex-box float-end">
+                                <button type="button" class="btn btn-outline-secondary addtagbtn"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#AddTagModal">Добавление тэга
+                                </button>
+                                <button type="button" class="btn btn-primary addtodobtn "
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#AddTodoModal">Добавление задачи
+                                </button>
+                            </div>
+                            <div class="row mb-0">
+                                <div class="col-md-5 offset mb-1">
+                                    <div class="panel-body">
+                                        <div class="form-group">
+                                            <input type="text" name="search" id="search" class="form-control"
+                                                   placeholder="Поиск задачи"/>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        @endauth
+
                         <div class="card-body">
                             <table class="table table-bordered">
                                 <thead>
@@ -229,7 +230,7 @@
                         $.ajax({
                             type: "GET",
                             url: "/fetch-todos",
-                            data:{query:query},
+                            data: {query: query},
                             dataType: "json",
                             success: function (response) {
                                 //console.log(response);
@@ -256,7 +257,7 @@
                         });
                     }
 
-                    $(document).on('keyup', '#search', function(){
+                    $(document).on('keyup', '#search', function () {
                         var query = $(this).val();
                         fetchtodo(query);
                     });
@@ -299,7 +300,7 @@
                         });
 
                         var options = {
-                            success: function (response, statusText) {
+                            success: function (response) {
                                 $('#save_msgList').html("");
                                 $('#success_message').addClass('alert alert-success');
                                 $('#success_message').text(response.message);
@@ -308,9 +309,10 @@
                                 $('#AddTodoModal').modal('hide');
                                 fetchtodo();
                             },
-                            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                            error: function (XMLHttpRequest) {
                                 $('#save_msgList').html("");
                                 $('#save_msgList').addClass('alert alert-danger');
+                                console.log(XMLHttpRequest);
                                 $.each(XMLHttpRequest.errors, function (key, err_value) {
                                     $('#save_msgList').append('<li>' + err_value + '</li>');
                                 });
@@ -370,7 +372,7 @@
                         });
 
                         var options = {
-                            success: function (response, statusText) {
+                            success: function (response) {
                                 $('#update_msgList').html("");
                                 $('#success_message').addClass('alert alert-success');
                                 $('#success_message').text(response.message);

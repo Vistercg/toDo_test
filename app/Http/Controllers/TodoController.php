@@ -22,13 +22,22 @@ class TodoController extends Controller
     public function fetchtodo(Request $request)
     {
         $query = $request->get('query');
-        if($query != '')
-        {
-            $todos = ToDo::where('user_id', Auth::user()->id)
+        if ($query != '') {
+            $user_id = Auth::user()->id;
+            $todos = ToDo::where(function ($id) use ($user_id) {
+                $id->where('user_id', '=', $user_id);
+            })->where(function ($data) use ($query) {
+                $data->where('name', 'like', '%' . $query . '%')
+                    ->orWhere('description', 'like', '%' . $query . '%')
+                    ->orWhere('status', 'like', '%' . $query . '%');
+                })
+                ->get();
+
+            /*$todos = ToDo::where('user_id', Auth::user()->id)
                 ->where('name', 'like', '%'.$query.'%')
                 ->orWhere('description', 'like', '%'.$query.'%')
                 ->orWhere('status', 'like', '%'.$query.'%')
-                ->get();
+                ->get();*/
         } else {
             $todos = ToDo::where('user_id', Auth::user()->id)->orderBy('id', 'ASC')->get();
         }
@@ -72,7 +81,7 @@ class TodoController extends Controller
     {
         $todo = Todo::find($request->todo_id);
 
-        if(!$todo){
+        if (!$todo) {
             return response()->json([
                 'status' => 404,
                 'message' => 'Такой задачи не найдено.',
@@ -104,24 +113,25 @@ class TodoController extends Controller
         }
     }
 
-    private function _fillTodoByRequest(Todo $todo, ToDoRequest $request){
+    private function _fillTodoByRequest(Todo $todo, ToDoRequest $request)
+    {
 
         $image = $todo->image;
         $todo->fill($request->all());
         $todo->tags()->detach();
-        if(!empty($request->tags)){
+        if (!empty($request->tags)) {
             $todo->tags()->attach(Tag::whereIn('id', $request->tags)->get());
         }
 
-        if (!empty($request->file('image'))){
-            $todo->image =  $request->file('image')->store('image', 'public');
+        if (!empty($request->file('image'))) {
+            $todo->image = $request->file('image')->store('image', 'public');
         } else {
             $todo->image = $image;
         }
 
         $todo->save();
 
-        if(!empty($request->tag)) {
+        if (!empty($request->tag)) {
             $todo->tags()->attach($request->tag);
         }
 
